@@ -34,11 +34,10 @@ int main()
     printf("\n      2 - создание архива призывников;");//!
     printf("\n      3 - сортировка компонент архива;");//!
     printf("\n      4 - печать архива призывников;");//!
-    printf("\n      5 - печать кодификатора призывников;");//!
+    printf("\n      5 - удаление компоненты из архива;");//!
     printf("\n      6 - добавление компонент в архив;");//!
-    printf("\n      7 - удаление компоненты из архива;");//!
-    printf("\n      8 - изменение компоненты в архиве;");
-    printf("\n      9 - обработка архива \n");
+    printf("\n      7 - изменение компоненты в архиве;");
+    printf("\n      8 - обработка архива \n");
 		//очистка буфера клавиатуры и ввод режима
 		fflush(stdin);
 	  KeyRegime=(int)ceil(GetNumber(0,9,1,0,1,0));
@@ -49,11 +48,10 @@ int main()
 			case 2 : CreateArchive();   break;
 			case 3 : SortArchive();			break;
 			case 4 : PrintArchive();    break;
-			case 5 : PrintKodif(nk);		break;
+			case 5 : DeleteArchive();		break;
 			case 6 : AddArchive();			break;
-			case 7 : DeleteArchive();		break;
-			case 8 : ChangeArchive();		break;
-			case 9 : WorkUpArchive();		break;
+			case 7 : ChangeArchive();		break;
+			case 8 : WorkUpArchive();		break;
 		}
 	} 
 	while (KeyRegime!=0);	//режим 0 - выход из программы
