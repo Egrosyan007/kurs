@@ -1,17 +1,18 @@
 //Удаление компонента из архива изделий
-////#include "desunit.h"
+#include "desunit.h"
 ////#include "baseunit.h"
+#include <string.h>
 
 //----------------------------------DeleteArchive()
 //Удаление компонента из архива изделий. 
 //Просмотр дека слева направо
 int DeleteArchive()
 {											
-int Kod,KodPr;
+char Num[5], NumPr[5];
 unsigned char Cond;
-DynProduct *Lp,*Rp;	// левый и правый указатели дека 
 DynProduct  *Del;		// указатель на удаляемый элемент из дека
-DynProduct  *Run;   // текущий указатель дека архива 
+DynProduct *Beg;		// указатель на начало стека
+DynProduct *Run;        // текущий указатель стека архива 
 int np;
 char Sr[80]="";
   if ( ! SignArchive ) //архив не создан
@@ -20,50 +21,50 @@ char Sr[80]="";
 		 wait_press_key("\nДля продолжения нажмите любую клавишу\n");
 		 return 1;
 	}
-  ReadFileOut(&np,&Lp,&Rp);//создается архивный дек
-  //ввод кода удаляемого изделия
+	ReadFileOut(&np,&Beg);//создается архивный дек
+	//ввод кода удаляемого изделия
 	printf("\nУкажите код удаляемого компонента : ");
-  Kod=(int)ceil(GetNumber(0,999999,1,0,6,0));
-	Cond=0; KodPr=Kod;
-  //поиск введенного кода в деке
-	if ( Kod == Lp->Inf.Kod)
-	{		//удаляется крайний левый компонент 
+	scanf_s("%s", Num, 5);
+ 	//Num=(int)ceil(GetNumber(0,999999,1,0,6,0));
+	Cond=0;
+	strcpy(NumPr, Num);
+	
+	//поиск введенного кода в деке
+	if ( Num == Beg->Inf.Num)
+	{//удаляется крайний левый компонент 
 		Cond=1;
-		Del=Lp; Lp=Lp->Next; Lp->Prev=NULL;
+		Del=Beg; Beg=Beg->Next;
 		free(Del);
 	}
-  else
-	{  //поиск введенного кода в средине дека
-		 //просмотр с левой стороны
-		Run=Lp->Next;
-    while ( Run != NULL ) 
-    {
-      if ( Kod == Run->Inf.Kod )
-			{	//в деке найден компонент с заданным кодом
-				Cond=1;
-				Del=Run;
-				if (Run == Rp )//удаляется крайний правый компонент
-					{Rp=Run->Prev; Rp->Next=NULL;}
-				else	//удаляется компонент внутри дека
-					{Run->Next->Prev=Run->Prev; Run->Prev->Next=Run->Next;}
-				free(Del); //освобождение памяти
-				break;
+  	else
+	{  	//поиск введенного кода в средине cтека
+		//просмотр с левой стороны
+		Run=Beg->Next;
+		while ( Run->Next != NULL ) 
+		{	if ( Num == Run->Next->Inf.Num )
+				{	//в стеке найден компонент с заданным кодом
+					Cond=1;
+					Del=Run->Next;
+					//удаляется компонент внутри дека
+					Run->Next = Del->Next;
+					free(Del); //освобождение памяти
+					break;
+				}
+				Run=Run->Next;
 			}
-			Run=Run->Next;
-		}
 	}
   if( Cond == 1 ) //компонент найден и удален
   {  
     np--;
-    WriteFileOut(Lp,Rp);	//запись дека в бинарный файл
-		Lp=Rp=NULL;
+    WriteFileOut(Beg);	//запись стека в бинарный файл
+		Beg=NULL;
     printf("\nУдаление компонента из архива закончено");
 	}
   else						//компонент не найден
 	{
-		DisposeProduct(Lp,Rp);
-		Lp=Rp=NULL;
-		printf("\nВ архиве нет компонента с кодом %6d",KodPr);
+		DisposeProduct(Beg);
+		Beg=NULL;
+		printf("\nВ архиве нет компонента с кодом %6s",NumPr);
 	}
 	wait_press_key("\nДля продолжения нажмите любую клавишу\n");
 	return 0;

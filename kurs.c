@@ -40,7 +40,7 @@ int main()
     printf("\n      8 - обработка архива \n");
 		//очистка буфера клавиатуры и ввод режима
 		fflush(stdin);
-	  KeyRegime=(int)ceil(GetNumber(0,9,1,0,1,0));
+		KeyRegime=(int)ceil(GetNumber(0,9,1,0,1,0));
 		switch (KeyRegime) 
     {	//вызов функций в соответствии с режимом обработки
 			case 0 : ;		              break;

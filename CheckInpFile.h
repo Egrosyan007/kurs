@@ -1,6 +1,6 @@
 //Контроль исходных текстовых файлов
-//#include "desunit.h"
-//#include "baseunit.h"
+////#include "desunit.h"
+////#include "baseunit.h"
 //-----------------------------------------------------------
 //-----------------------Определение типов
 //Тип string80 - 
@@ -25,8 +25,8 @@ FILE *FileError;          // файл протокола проверок
 char *FileErrorName="Error.dat";
 int const  NfMax = PMax; // макс.кол-во строк в текстовом файле 
 int 
-	 np,              // кол-во строк в файле "input.txt"
-   nd,              // кол-во строк в файле "add.txt"
+	np,              // кол-во строк в файле "input.txt"
+    nd,              // кол-во строк в файле "add.txt"
    nk,				      // кол-во строк в файле "kodif.txt"
    FatalError;      // наличие ошибки в исходных данных
 

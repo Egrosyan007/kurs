@@ -12,21 +12,21 @@ double	PlanSt1,PlanSt2,PlanGod, //суммарные плановые показатели
 		    ProcSt1,ProcSt2,ProcGod, //процент выполнения плана
 				BufSt;                   //буферная переменная
 char St[80];
-DynProduct *Lp,*Rp;				// левый и правый указатели дека 
-DynProduct *Run;          // текущий указатель дека архива 
+DynProduct *Beg;				  // указатель на начало стека
+DynProduct *Run;          // текущий указатель стека архива 
   if ( ! SignArchive )		// архив не создан
 	{
       printf("Архивный файл не создан. Режим отменяется");
       return;
 	}
-  ReadFileOut(&np,&Lp,&Rp);//формирование архивного дека
+  ReadFileOut(&np,&Beg);//формирование архивного дека
   printf("\nУкажите номер цеха  ");//ввод номера цеха
   Shop=(unsigned char)ceil(GetNumber(1,99,1,0,2,0));
 
 	//ПЕЧАТЬ СВЕДЕНИй О ВЫПОЛНЕНИИ ПЛАНА ПО ЦЕХУ
 	PlanSt1=0; PlanSt2=0;
   FactSt1=0; FactSt2=0;
-  k=0; Run=Lp;
+  k=0; Run=Beg;
   while (Run!=NULL) 
   {	//поиск сведений по заданному цеху
     if (Shop==Run->Inf.NumberShop)
@@ -98,7 +98,7 @@ DynProduct *Run;          // текущий указатель дека архива
 " --------------------------------------------------------------- ");
 
 	m=0;k=-2;
-  Run=Lp;
+  Run=Beg;
   while ( Run != NULL)	//цикл просмотра дека
 	{	//расчет выполнения плана по изделию 
 	  ProcGod=100*(Run->Inf.Fact[0]+Run->Inf.Fact[1])/
@@ -120,7 +120,7 @@ DynProduct *Run;          // текущий указатель дека архива
   WritelnString(
 " ---------------- ");
 //" --------------------------------------------------------------- ");
-	DisposeProduct(Lp, Rp);//удаление дека
+	DisposeProduct(Beg);//удаление дека
 	printf("\nОбработка архива закончена");
 
 	wait_press_key("\nДля продолжения нажмите любую клавишу\n");

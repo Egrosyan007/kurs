@@ -141,76 +141,76 @@ int PrintArchive()
 
 }	//-----PrintArchive()
 
-// //-----------------------------------------------MakeKodifs()
-// //Чтение файла "Kodif.txt" и формирование массива Kodifs 
-// //Возвращает через параметр длину массива nk
-// void MakeKodifs(int *nk)
-// { 
-// 	char Sa[80];
-// 	int k;
-// 	char *token;
-// 	char Seps[]=" \t\n";
-// 	//открывается файл кодификатора "Kodif.txt"
-// 	if((fKodif=fopen(fKodifName,"rt"))==NULL)
-// 	{
-// 		 printf("\nФайл %s не найден\n",fArTxtName);
-// 		 wait_press_key("\nДля завершения программы нажмите любую клавишу\n");
-// 		 exit(0);
-// 	}
+//-----------------------------------------------MakeKodifs()
+//Чтение файла "Kodif.txt" и формирование массива Kodifs 
+//Возвращает через параметр длину массива nk
+void MakeKodifs(int *nk)
+{ 
+	char Sa[80];
+	int k;
+	char *token;
+	char Seps[]=" \t\n";
+	//открывается файл кодификатора "Kodif.txt"
+	if((fKodif=fopen(fKodifName,"rt"))==NULL)
+	{
+		 printf("\nФайл %s не найден\n",fArTxtName);
+		 wait_press_key("\nДля завершения программы нажмите любую клавишу\n");
+		 exit(0);
+	}
   
-//   *nk=0;	//длина массива
-//   while (fgets(Sa,80,fKodif)!=NULL) //чтение "Kodif.txt"
-// 	{
-// 		k=0;
-// 		token=strtok(Sa,Seps);	//Выделение первого слова
-// 		while(token!=NULL)//цикл выделения слов из исходной строки
-// 		{
-// 			k++;
-// 			switch ( k)
-// 			{	//заполнение полей структуры кодификатора
-// 				case 1:sscanf_s(token,"%d",&Kodif.Kod);				break;
-// 				case 2:strcpy(Kodif.Name,token);							break;
-// 				case 3:strcat(strcat(Kodif.Name," "),token);	break;
-// 			}
-// 			token=strtok(NULL,Seps);	//Выделение очередного слова
-// 		}
-// 		FillString(Kodif.Name,35,1);//заполнение пробелами справа
-// 		Kodifs[*nk]=Kodif;//запись структуры в массив
-//     (*nk)++;					//увеличение длины массива
-// 	}
-//   fclose(fKodif);
-// }	//----- MakeKodifs() 
-// //-----------------------------------------------PrintKodif()
-// // Вывод кодификатора изделий на экран, в файл 
-// int PrintKodif(int nk)
-// {
-// 	char s[80];
-// 	unsigned char i,j=0;
-//   if (SignArchive==0)
-// 	{
-// 		 printf("\nАрхив не создан. Режим отменяется.\n");
-// 		 wait_press_key("\nДля продолжения нажмите любую клавишу\n");
-// 		 return 0;
-// 	}
-//   WritelnString(
-// "\n                КОДИФИКАТОР ВЫПУСКАЕМОЙ ПРОДУКЦИИ");
-//   WritelnString(
-// " ---------------------------------------------------------------- ");
-//   WritelnString(
-// "| Nп/п |   Код изделия  |    Наименование  изделия               |");
-//   WritelnString(
-// " ---------------------------------------------------------------- ");
-//   j=0;
-//   for ( i=0; i<nk; i++ )
-// 	{
-// 		Kodif=Kodifs[i];
-// 		j++; 
-// 		sprintf(s,"|%4d.       %6d          %s  |",
-// 															j,Kodif.Kod,Kodif.Name);
-// 		WritelnString(s);
-// 	}
-//   WritelnString(
-// " ---------------------------------------------------------------- ");
-// 	wait_press_key("\nДля продолжения нажмите любую клавишу\n");
-// 	return 0;
-// }	//-----PrintKodif() 
+  *nk=0;	//длина массива
+  while (fgets(Sa,80,fKodif)!=NULL) //чтение "Kodif.txt"
+	{
+		k=0;
+		token=strtok(Sa,Seps);	//Выделение первого слова
+		while(token!=NULL)//цикл выделения слов из исходной строки
+		{
+			k++;
+			switch ( k)
+			{	//заполнение полей структуры кодификатора
+				case 1:sscanf_s(token,"%d",&Kodif.Kod);				break;
+				case 2:strcpy(Kodif.Name,token);							break;
+				case 3:strcat(strcat(Kodif.Name," "),token);	break;
+			}
+			token=strtok(NULL,Seps);	//Выделение очередного слова
+		}
+		FillString(Kodif.Name,35,1);//заполнение пробелами справа
+		Kodifs[*nk]=Kodif;//запись структуры в массив
+    (*nk)++;					//увеличение длины массива
+	}
+  fclose(fKodif);
+}	//----- MakeKodifs() 
+//-----------------------------------------------PrintKodif()
+// Вывод кодификатора изделий на экран, в файл 
+int PrintKodif(int nk)
+{
+	char s[80];
+	unsigned char i,j=0;
+  if (SignArchive==0)
+	{
+		 printf("\nАрхив не создан. Режим отменяется.\n");
+		 wait_press_key("\nДля продолжения нажмите любую клавишу\n");
+		 return 0;
+	}
+  WritelnString(
+"\n                КОДИФИКАТОР ВЫПУСКАЕМОЙ ПРОДУКЦИИ");
+  WritelnString(
+" ---------------------------------------------------------------- ");
+  WritelnString(
+"| Nп/п |   Код изделия  |    Наименование  изделия               |");
+  WritelnString(
+" ---------------------------------------------------------------- ");
+  j=0;
+  for ( i=0; i<nk; i++ )
+	{
+		Kodif=Kodifs[i];
+		j++; 
+		sprintf(s,"|%4d.       %6d          %s  |",
+															j,Kodif.Kod,Kodif.Name);
+		WritelnString(s);
+	}
+  WritelnString(
+" ---------------------------------------------------------------- ");
+	wait_press_key("\nДля продолжения нажмите любую клавишу\n");
+	return 0;
+}	//-----PrintKodif() 

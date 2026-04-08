@@ -124,26 +124,20 @@ void SortKodif(int nk)
 		}
 }	//-----SortKodif() 
 //-----------------------------------------ReversProduct()
-//Реверс дека изделий. Просмотр с левой стороны 
-//Вставка в буферный дек с левой стороны
-void ReversProduct(DynProduct **Lp, DynProduct **Rp)
+//Реверс стека изделий.
+void ReversProduct(DynProduct **Beg)
 {            
-	DynProduct *LpBuf,*RpBuf;	// указатели буферного дека архива 
+	DynProduct *BegBuf;	// указатели буферного дека архива 
 	DynProduct *Run;					// текущий указатель дека архива 
-	LpBuf=RpBuf=NULL;
-	while (*Lp != NULL)
-  {
-		Run=*Lp;
-		*Lp=(*Lp)->Next;
-			Run->Prev=NULL;		//связывание указателей
-			if (LpBuf==NULL) 
-				{RpBuf=Run; Run->Next=NULL;}
-			else
-				{(LpBuf)->Prev=Run; Run->Next=LpBuf;}
-			LpBuf=Run;
+	BegBuf=NULL;
+	while (*Beg != NULL)
+  	{
+		Run=*Beg;
+		*Beg=(*Beg)->Next;
+		Run->Next=NULL;
+		*Beg=BegBuf;
 	}
-	*Lp=LpBuf; LpBuf=NULL;
-	*Rp=RpBuf; RpBuf=NULL;
+	*Beg=BegBuf; BegBuf = NULL;
 }	//-----ReversProduct() 
 //--------------------------------------------ReadFileOut()
 //Чтение бинарного файла архива и формирование дека структур 
@@ -152,10 +146,10 @@ void ReversProduct(DynProduct **Lp, DynProduct **Rp)
 //Через параметры возвращаются количество элементов,
 //указатели на левый и правый концы дека
 //Функция возвращает 0, если дек создан, иначе 1
-int ReadFileOut(int *np, DynProduct **Lp, DynProduct **Rp)
+int ReadFileOut(int *np, DynProduct **Beg)
 {            
 	ProductType Product;
-	DynProduct *Run;			// текущий указатель дека архива 
+	DynProduct *Run;			// текущий указатель стека архива 
 	if (SignArchive==0)		//флаг 1-архив создан
 	{
 		 printf("\nАрхив не создан. Режим отменяется.\n");
@@ -170,40 +164,36 @@ int ReadFileOut(int *np, DynProduct **Lp, DynProduct **Rp)
 		return 1;
 	}
   *np=0;
-  *Lp = NULL; *Rp=NULL;
+  *Beg = NULL;
 	//считывание структур архива
   while (fread(&Product,sizeof(ProductType),1,fArBin)==1)
 	{	//выделение памяти для элемента дека
 		Run=(DynProduct *)malloc(sizeof(DynProduct));
 		(*np)++;
 		Run->Inf=Product;	//заполнение информационной части       
-		Run->Prev=NULL;		//связывание указателей
-	  if (*Rp==NULL) 
-			{*Rp=Run; Run->Next=NULL;}
-		else
-			{(*Lp)->Prev=Run;Run->Next=*Lp;}
-	  *Lp=Run;
+		Run->Next=*Beg;		//связывание указателей
+	  	*Beg=Run;
 	}
 	fclose(fArBin);
-	ReversProduct(Lp, Rp);  // реверс дека
+	ReversProduct(Beg); // реверс дека
 	return 0;
 }	//-----ReadFileOut() 
 //-----------------------------------------DisposeProduct()
 //Удаление дека изделий. Просмотр с левой стороны 
-void DisposeProduct(DynProduct *Lp, DynProduct *Rp)
+void DisposeProduct(DynProduct *Beg)
 {            
-	DynProduct *Run;			// текущий указатель дека архива 
-  while (Lp != NULL)
-  {
-		Run=Lp;
-		Lp=Lp->Next;
+	DynProduct *Run;			// текущий указатель стека архива 
+	while (Beg != NULL)
+	{
+		Run=Beg;
+		Beg=Beg->Next;
 		free(Run);	//освобождение памяти
 	}
 }	//-----DisposeProduct() 
 //---------------------------------------------WriteFileOut()
 //Запись структур из дека в бинарный файл архива
 //Просмотр с левой стороны с последующим удалением дека 
-int WriteFileOut(DynProduct *Lp,DynProduct *Rp)
+int WriteFileOut(DynProduct *Beg)
 {           
 	ProductType Product;
 	DynProduct *Run;								// текущий указатель дека архива 
@@ -213,15 +203,15 @@ int WriteFileOut(DynProduct *Lp,DynProduct *Rp)
 		 wait_press_key("\nДля завершения программы нажмите любую клавишу\n");
 		 exit(0);
 		}
-  Run=Lp;
-  while ( Run != NULL)
+	Run=Beg;
+	while ( Run != NULL)
 	{	//цикл записи структур в файл
 		Product=Run->Inf;
 		fwrite(&Product,sizeof(ProductType),1,fArBin);
 		Run=Run->Next;
 	} 
-  fclose(fArBin);
-  DisposeProduct(Lp,Rp);	//удаление дека
+	fclose(fArBin);
+	DisposeProduct(Beg);	//удаление стека
 	return 0;
 }	//-----WriteFileOut() 
 //-----------------------------------------------

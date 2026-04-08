@@ -13,8 +13,8 @@ int ChangeArchive()
 int Kod,Kod1,np;
 unsigned char Cond=0;
 ProductType Product;
-DynProduct *Lp,*Rp;			// левый и правый указатели очереди 
-DynProduct *Run;        // текущий указатель очереди архива 
+DynProduct *Beg;		// указатель на начало стека
+DynProduct *Run;        // текущий указатель стека архива 
   if ( ! SignArchive )	// архив не создан
   {
 		 printf("\nАрхив не создан. Режим отменяется.\n");
@@ -22,12 +22,12 @@ DynProduct *Run;        // текущий указатель очереди архива
 		 return 1;
 	}
 	//формирование архивного дека
-	ReadFileOut(&np,&Lp,&Rp);
+	ReadFileOut(&np,&Beg);
 	//ввод кода изменяемого компонента
   printf("\nУкажите код изделия изменяемого компонента :");
 	Kod=(int)ceil(GetNumber(0,999999,1,0,6,0));
   Kod1=Kod; printf("Kod = %6d",Kod1);
-	Run=Lp; Cond=0;
+	Run=Beg; Cond=0;
   while (Run!=NULL) //цикл поиска введенного кода в деке
   {
 		if (Kod==Run->Inf.Kod)
@@ -38,9 +38,9 @@ DynProduct *Run;        // текущий указатель очереди архива
 			printf("\n          Укажите следующие реквизиты :\n");
 			printf("   ед.измерения  цена  план-1  план-2  факт-1  факт-2\n");
 			MakeComponent(&Product);	//ввод изменений в полях
-			Run->Inf=Product;		//запись измененной структуры в дек
-			WriteFileOut(Lp,Rp);//запись дека в архивный файл
-			Lp=Rp=NULL;
+			Run->Inf=Product;			//запись измененной структуры в стек
+			WriteFileOut(Beg);			//запись стека в архивный файл
+			Beg=NULL;
 			printf("Изменение компонента в архиве закончено\n");
 			break;
 		} 

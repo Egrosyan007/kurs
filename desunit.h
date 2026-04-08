@@ -46,11 +46,10 @@ typedef struct KodifTyp //тип компонента кодификатора изделий
 		char Name[35];		// наименование изделия 
 	} KodifType;			//синоним типа компонента кодификатора изделий
 
-typedef struct DynProd		//Тип элемента дека 
+typedef struct DynProd		//Тип элемента стека
 	{							
 		ProductType  Inf;			//информационная часть
 		struct DynProd *Next;		//указатель на следующий элемент
-		struct DynProd *Prev;		//указатель на предыдущий элемент
 	} DynProduct;			      	//синоним типа элемента дека
 
 #define KMax 100			//макс.кол-во компонентов кодификатора 
