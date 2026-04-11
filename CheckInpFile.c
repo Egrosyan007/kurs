@@ -30,22 +30,21 @@ void CheckFiles()
   FormatFileProduct(fAddTxt,fAddTxtName,&nd,NfMax,
                     AddProducts);
 	//проверка формата файла кодификатора
-  FormatFileKodif();
 
   if (FatalError==0)
 	{	//фатальных ошибок не было
 		//проверка диапазонов данных в исходных файлах
-		CheckProdDiapason(fArTxtName,np,Products);
-    CheckProdDiapason(fAddTxtName,nd,AddProducts);
-    CheckKodifDiapason();
+		//CheckProdDiapason(fArTxtName,np,Products);
+    //CheckProdDiapason(fAddTxtName,nd,AddProducts);
+    //CheckKodifDiapason();
 	}
 
   if (! FatalError)
 	{	//фатальных ошибок не было
 		//Проверка дублирования параметра Kod в "Kodif.txt"
-		KodifParameters();
+		//KodifParameters();
 		//сортировка массива кодификатора
-		SortKodif(nk);
+		//SortKodif(nk);
 		//Проверка параметров записей в "input.txt"
     ProdParameters(Products,np,fArTxtName);
 		//Проверка параметров записей в "add.txt"
@@ -88,133 +87,95 @@ void FormatFileProduct(FILE *F, char *FileName, int *nf,
 		token=strtok(Sa,Seps);	//Выделение первого слова
 		while(token!=NULL)			//цикл выделения слов из строки Sa
 		{
-      k++;
-      if (k>8)		//слов больше 8 - ошибка
+      	k++;
+      	if (k>8)		//слов больше 8 - ошибка
 			{
-        FatalError=1;
-        sprintf(Sr,"Файл %s : в строке %d свыше 8 элементов\n",
+        		FatalError=1;
+        		sprintf(Sr,"Файл %s : в строке %d свыше 8 элементов\n",
 								FileName,i+1);
 				//запись сообщения в файл ошибок
-        fwrite(Sr,sizeof(string80),1,FileError);
+        		fwrite(Sr,sizeof(string80),1,FileError);
 			}
-      switch (k) 
+    	switch (k) 
 			{	//заполнение полей структуры
-				case 1:Code=sscanf_s(token,"%d",&Product.NumberShop); break;
-				case 2:Code=sscanf_s(token,"%d",&Product.Kod);				break;
-				case 3:
-              if (strlen(token)>4)//Ед.изм. больше 4 символов
-							{ FatalError=1;
+				case 1:
+              	if (strlen(token)>15)//Ед.изм. больше 14 символов
+							{ 	FatalError=1;
 								sprintf(Sr,
-	"Файл %s : в строке %d  длина элемента 3 свыше 4 символов\n",
-									FileName,i+1);
+								"Файл %s : в строке %d  длина элемента 1 свыше 15 символов\n",
+								FileName,i+1);
 								//запись сообщения в файл ошибок
-				        fwrite(Sr,sizeof(string80),1,FileError);
+				        		fwrite(Sr,sizeof(string80),1,FileError);
 							}
-							strcpy(Product.Dimens,token);
-							FillString(Product.Dimens,5,1);								break;
-				case 4:Code=sscanf_s(token,"%lf",&Product.Price);		break;
-				case 5:Code=sscanf_s(token,"%lf",&Product.Plan[0]);	break;
-				case 6:Code=sscanf_s(token,"%lf",&Product.Plan[1]);	break;
-				case 7:Code=sscanf_s(token,"%lf",&Product.Fact[0]);	break;
-				case 8:Code=sscanf_s(token,"%lf",&Product.Fact[1]);	break;
+				strcpy(Product.Names,token);
+				FillString(Product.Names,20,1); break;
+				case 2:
+              	if (strlen(token)!=10)//Ед.изм. больше 4 символов
+							{ 	FatalError=1;
+								sprintf(Sr,
+								"Файл %s : в строке %d  длина элемента 2 не равна 10 символам\n",
+								FileName,i+1);
+								//запись сообщения в файл ошибок
+				        		fwrite(Sr,sizeof(string80),1,FileError);
+							}
+				strcpy(Product.Date,token);
+				FillString(Product.Date,13,1); break;
+				case 3:
+              	if (strlen(token)!=5)//Ед.изм. больше 4 символов
+							{ 	FatalError=1;
+								sprintf(Sr,
+								"Файл %s : в строке %d  длина элемента 3 не равна 5 символам\n",
+								FileName,i+1);
+								//запись сообщения в файл ошибок
+				        		fwrite(Sr,sizeof(string80),1,FileError);
+							}
+				strcpy(Product.Num,token);
+				FillString(Product.Num,5,1); break;
+				case 4:
+              	if (strlen(token)>21)//Ед.изм. больше 4 символов
+							{ 	FatalError=1;
+								sprintf(Sr,
+								"Файл %s : в строке %d  длина элемента 4 свыше 21 символов\n",
+								FileName,i+1);
+								//запись сообщения в файл ошибок
+				        		fwrite(Sr,sizeof(string80),1,FileError);
+							}
+				strcpy(Product.Date,token);
+				FillString(Product.Date,25,1); break;
+				case 5:
+              	if (strlen(token)>3)//Ед.изм. больше 3 символов
+							{ 	FatalError=1;
+								sprintf(Sr,
+								"Файл %s : в строке %d  длина элемента 5 свыше 3 символов\n",
+								FileName,i+1);
+								//запись сообщения в файл ошибок
+				        		fwrite(Sr,sizeof(string80),1,FileError);
+							}
+				strcpy(Product.IsApproved,token);
+				FillString(Product.IsApproved,5,1); break;
 			}
-      if ((k!=3) && (Code<1))
-			{	//ошибка преобразования слова к числовому параметру
-        FatalError=1;
-        sprintf(Sr,
-	"Файл %s : в строке %d неправильный формат элемента %d (%s)\n",
-						FileName,i+1,k,token);
-					//запись сообщения в файл ошибок
-					fwrite(Sr,sizeof(string80),1,FileError);
-			}
+    //   if ((k!=3) && (Code<1))
+	// 		{	//ошибка преобразования слова к числовому параметру
+    //     FatalError=1;
+    //     sprintf(Sr,
+	// "Файл %s : в строке %d неправильный формат элемента %d (%s)\n",
+	// 					FileName,i+1,k,token);
+	// 				//запись сообщения в файл ошибок
+	// 				fwrite(Sr,sizeof(string80),1,FileError);
+	// 		}
 			token=strtok(NULL,Seps);	//Выделение следующего слова
 		}
-    if (k<8)
-		{	//количество параметров в строке меньше 8
-      FatalError=1;
-      sprintf(Sr,
-			"Файл %s : в строке %d меньше 8 элементов\n",FileName,i+1);
-			//запись сообщения в файл ошибок
-      fwrite(Sr,sizeof(string80),1,FileError);
+    if (k<5)
+		{	//количество параметров в строке меньше 5
+			FatalError=1;
+			sprintf(Sr,
+				"Файл %s : в строке %d меньше 5 элементов\n",FileName,i+1);
+				//запись сообщения в файл ошибок
+			fwrite(Sr,sizeof(string80),1,FileError);
 		}
     (*Prod)[i]=Product;//добавление структуры в массив
 	}
 }   //-----FormatFileProduct()
-//-------------------------------------FormatFileKodif()
-//Проверка форматов файла "Kodif.txt"
-void  FormatFileKodif()
-{              
-	char k;
-	int i, Code;
-  string80 Sa,S1;
-	char *token;
-	char Seps[]=" \t\n";
-	
-	//проверка структуры файла "kodif.txt", удаление пустых строк
-	//и формирование массива строк *Sf из файла
-	ReadAndCheckSpaces(fKodif,fKodifName,&nk,NfMax);
-  if (FatalError) return;
-  for (i=0; i<nk; i++)//цикл просмотра массива строк
-	{	
-    strcpy(Sa,(*Sf)[i]);//i-я строка копируется в Sa и
-		k=0;
-		token=strtok(Sa,Seps);	//Выделение первого слова
-		while(token!=NULL)			//цикл выделения слов из строки Sa
-		{
-      k++;
-      if (k>3) //количество слов больше 3
-			{
-        FatalError=1;
-				sprintf(Sr,
-"Файл Kodif.txt : в строке %d свыше 3 элементов\n",i+1);
-        fwrite(Sr,sizeof(string80),1,FileError);
-			}
-      switch (k)
-			{
-				case 1:Code=sscanf_s(token,"%d",&Kodif.Kod);	
-          if (Code<1)
-					{//не удалось преобразовать 1-е слово в числовой код
-            FatalError=1;
-		        sprintf(Sr,
-"Файл Kodif.txt : в строке %d неправильный формат элемента 1 (%s)\n",
-							i+1,token);
-		        fwrite(Sr,sizeof(string80),1,FileError);
-					}																						break;
-        case 2: 
-          if (strlen(token)>35) 
-					{ //1-е слово наименования изделия больше 35 символов
-            FatalError=1;
-						sprintf(Sr,
-"Файл Kodif.txt : в строке %d длина элемента 2 свыше 35 символов\n",
-							i+1);
-						fwrite(Sr,sizeof(string80),1,FileError);
-					}
-					strcpy(Kodif.Name,token); strcat(Kodif.Name," "); break;
-				//формирование наименования изделия из 2-х слов	
-        case 3: sprintf(S1,"%s%s%s",Kodif.Name," ",token);
-          if (strlen(S1)>35)
-					{ //два слова наименования изделия больше 35 символов
-            FatalError=1;
-						sprintf(Sr,
-"Файл Kodif.txt : в строке %d длина элемента 2 свыше 35 символов\n",
-							i+1);
-						fwrite(Sr,sizeof(string80),1,FileError);
-					}
-          strcpy(Kodif.Name,S1); FillString(Kodif.Name,35,1); break;
-			}
-			token=strtok(NULL,Seps);	//Выделение следующего слова
-		}
-    if (k<2)
-		{	//слов в строке меньше двух
-      FatalError=1;
-			sprintf(Sr,
-			"Файл Kodif.txt : в строке %d меньше 2 элементов\n",i+1);
-      fwrite(Sr,sizeof(string80),1,FileError);
-		}
-    //запись структуры кодификатора в массив 
-    Kodifs[i]=Kodif;
-	}
-}   //-----FormatFileKodif()
 //-------------------------------------ReadAndCheckSpaces()
 //Проверка наличия и ввод текстового файла, контроль количества
 //строк, и удаление в нем пустых строк 
@@ -301,117 +262,29 @@ void ReadAndCheckSpaces(FILE *F, char *FileName, int *nf,
 	}
 
 } //-----ReadAndCheckSpaces()
-//-------------------------------------CheckProdDiapason()
-//Проверка диапазонов параметров в "input.txt" и "add.txt"
-void CheckProdDiapason(char *FileName, int nf, ProductAr *Prod)
-{          
-int i;
-  for (i=0; i<nf; i++)
-	{
-    if (((*Prod)[i].NumberShop<1) || ((*Prod)[i].NumberShop>99)) 
-      ReportError1(FileName,i,1,1,99);
-    if (((*Prod)[i].Kod<100000) || ((*Prod)[i].Kod>999999))
-      ReportError1(FileName,i,2,100000,999999);
-    if (((*Prod)[i].Price<0.1) || ((*Prod)[i].Price>999.99))
-      ReportError2(FileName,i,4,0.1,1000);
-    if (((*Prod)[i].Plan[0]<10) || ((*Prod)[i].Plan[0]>9999))
-      ReportError1(FileName,i,5,10,10000);
-    if (((*Prod)[i].Plan[1]<10) || ((*Prod)[i].Plan[1]>9999))
-      ReportError1(FileName,i,6,10,10000);
-    if (((*Prod)[i].Fact[0]<10) || ((*Prod)[i].Fact[0]>9999))
-      ReportError1(FileName,i,7,10,10000);
-    if (((*Prod)[i].Fact[1]<10) || ((*Prod)[i].Fact[1]>9999))
-      ReportError1(FileName,i,8,10,10000);
-	}
-}  //-----CheckProdDiapason()
-//-------------------------------------CheckKodifDiapason()
-//Проверка диапазонов параметров в "Kodif.txt" 
-void CheckKodifDiapason()
-{
-	int i;
-  for (i=0; i<nk; i++)
-		if ((Kodifs[i].Kod<100000) || (Kodifs[i].Kod>999999))
-		{
-			FatalError=1;
-			sprintf(Sr,
-				"Файл Kodif.txt: в строке %d элемент 1 "
-				"вне пределов 100000..999999\n",i+1);
-		  fwrite(Sr,sizeof(string80),1,FileError);
-		}
-}    //End { CheckKodifDiapason };
-//-------------------------------------KodifParameters()
-//Проверка дублирования параметра Kod в файле "Kodif.txt"
-void KodifParameters()
-{          
-int  i,j,Kod;
-  for (i=0; i<nk-1; i++)
-	{
-    Kod=Kodifs[i].Kod;
-    for (j=i+1; j<nk; j++)
-      if (Kod==Kodifs[j].Kod)
-			{	//код дублируется
-        FatalError=1;
-				sprintf(Sr,
-"Файл Kodif.txt: равные значения KodProduct в строках %d и %d (%d)\n",
-				i+1,j+1,Kod);
-				fwrite(Sr,sizeof(string80),1,FileError);
-			}
-	}
-} //-----KodifParameters()
 //-------------------------------------ProdParameters()
 //Проверка параметров записей в файлах "input.txt" и "add.txt"
 void ProdParameters(ProductAr *Prod, int n, char *FileName)
 {     
 	const char Measurs[2][5] = {{"шт. "},{"кг  "}};
-int  i,j,k,Kod,Cond;
-char Meas[5];
-//{ Проверка дублирования параметра KodProduct }
-  for (i=0; i<n-1; i++)
-	{
-    Kod=(*Prod)[i].Kod;
-    for (j=i+1; j<n; j++)
-      if (Kod==(*Prod)[j].Kod)
-			{ //код дублируется
-        FatalError=1;
-				sprintf(Sr,
-	"Файл %s : равные значения KodProduct в строках %d и %d (%d)\n",
-					FileName,i+1,j+1,Kod);
-				fwrite(Sr,sizeof(string80),1,FileError);
-			}
-	}
-
-// { Проверка наличия параметра KodProduct в кодификаторе }
-  for (i=0; i<n; i++)
-	{
-    Kod=(*Prod)[i].Kod;
-    k=SearchKodif(Kod,nk);//поиск в Kod кодификаторе
-    if (k==-1) 
-		{	//Kod в кодификаторе не найден
-      FatalError=1;
-			sprintf(Sr,
-"Файл %s : код изделия %d (строка %d) отсутствует в кодификаторе\n",
-					FileName,Kod,i+1);
-			fwrite(Sr,sizeof(string80),1,FileError);
-		}
-	}
-
-//{ Проверка единиц размерности }
-  for (i=0; i<n; i++)
-	{
-    strcpy(Meas,(*Prod)[i].Dimens);
-    Cond=0;
-    for (j=0; j<2; j++)
-      if (strcmp(Meas,Measurs[j])==0)
-        Cond=1;
-    if (! Cond) //единица измерения в массиве не найдена
+	int  i,j,k,Cond;
+	char Kod[5];
+	char Meas[5];
+	//{ Проверка дублирования параметра KodProduct }
+	for (i=0; i<n-1; i++)
 		{
-      FatalError=1;
-			sprintf(Sr,
-					"Файл %s : в строке %d неправильная ед.изм. (%s) \n",
-					FileName,i+1,Meas);
-			fwrite(Sr,sizeof(string80),1,FileError);
+		strcpy(Kod,(*Prod)[i].Num);
+		//Kod=(*Prod)[i].Num;
+		for (j=i+1; j<n; j++)
+		if (Kod==(*Prod)[j].Num)
+				{ //код дублируется
+			FatalError=1;
+					sprintf(Sr,
+		"Файл %s : равные значения NumProduct в строках %d и %d (%d)\n",
+						FileName,i+1,j+1,Kod);
+					fwrite(Sr,sizeof(string80),1,FileError);
+				}
 		}
-	}
 
 } //-----ProdParameters()
 //-------------------------------------ReportError1()

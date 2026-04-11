@@ -82,62 +82,21 @@ void UsesDevice()
 	//целая часть числа приводится к типу int
 	Device=(int)ceil(GetNumber(0,1,1,0,1,0));
 }	//-----UsesDevice() 
-//------------------------------------------SearchKodif()
-//Двоичный поиск в массиве кодификатора Kodifs
-//элемента с кодом Kod. Возвращает индекс найденного
-//элемента, -1, если элемент не найден
-int SearchKodif(int Kod, int nk)
-{ 
-	int  i1,i2,m;
-	int SearchKod=-1; //возвращаемое значение
-	i1=0; i2=nk-1;		//левая и правая границы диапазона
-  while (i1<=i2) 
-	{
-    m=(i1+i2)/2;		//середина диапазона
-    if (Kod==Kodifs[m].Kod)
-		{
-			SearchKod=m; break;	//Элемент найден
-		}
-    else
-      if (Kod>Kodifs[m].Kod)
-        i1=m+1;			//Изменение левой границы
-      else
-        i2=m-1;			//Изменение правой границы
-	}
-	return SearchKod;
-}	//-----SearchKodif() 
-//-------------------------------------------SortKodif()
-//Сортировка кодификатора "школьным" методом 
-//по возрастанию кода продукта
-void SortKodif(int nk)
-{ 
-  unsigned char i,j;
-  for (i=0; i<nk; i++)
-	{
-		for (j=0; j<nk; j++)
-			if (Kodifs[i].Kod<Kodifs[j].Kod) 
-			{
-				Kodif=Kodifs[i];
-				Kodifs[i]=Kodifs[j];
-				Kodifs[j]=Kodif;
-			}
-		}
-}	//-----SortKodif() 
 //-----------------------------------------ReversProduct()
 //Реверс стека изделий.
 void ReversProduct(DynProduct **Beg)
 {            
-	DynProduct *BegBuf;	// указатели буферного дека архива 
-	DynProduct *Run;					// текущий указатель дека архива 
-	BegBuf=NULL;
-	while (*Beg != NULL)
-  	{
-		Run=*Beg;
-		*Beg=(*Beg)->Next;
-		Run->Next=NULL;
-		*Beg=BegBuf;
-	}
-	*Beg=BegBuf; BegBuf = NULL;
+	DynProduct *RunBuf;	// указатели буферного дека архива 
+	DynProduct *Run;	// текущий указатель дека архива 
+	RunBuf=NULL;				//Первый элемент стека после реверсирования
+	while (*Beg!=NULL)
+		{
+		Run=*Beg;        //Элемент исключается из исходного стека Beg
+		*Beg=(*Beg)->Next;	
+		Run->Next=RunBuf; //и включается в стека Beg1 
+		RunBuf=Run;
+		}
+ 	*Beg=RunBuf;	//Последний элемент становится первым (вершина стека)
 }	//-----ReversProduct() 
 //--------------------------------------------ReadFileOut()
 //Чтение бинарного файла архива и формирование дека структур 

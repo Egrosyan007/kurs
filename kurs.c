@@ -40,9 +40,9 @@ int main()
     printf("\n      8 - обработка архива \n");
 		//очистка буфера клавиатуры и ввод режима
 		fflush(stdin);
-		KeyRegime=(int)ceil(GetNumber(0,9,1,0,1,0));
+		KeyRegime=(int)ceil(GetNumber(0,8,1,0,1,0));
 		switch (KeyRegime) 
-    {	//вызов функций в соответствии с режимом обработки
+    	{	//вызов функций в соответствии с режимом обработки
 			case 0 : ;		              break;
 			case 1 : CheckFiles();			break;
 			case 2 : CreateArchive();   break;
@@ -60,5 +60,6 @@ int main()
 
 	wait_press_key("\n	Выход");
 	return 0;
+
 }	//-----main()
 

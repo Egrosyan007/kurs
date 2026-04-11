@@ -8,9 +8,9 @@
 //Просмотр дека слева направо
 int DeleteArchive()
 {											
-char Num[5], NumPr[5];
+int Row, RowPr, counter;
 unsigned char Cond;
-DynProduct  *Del;		// указатель на удаляемый элемент из дека
+DynProduct *Del;		// указатель на удаляемый элемент из дека
 DynProduct *Beg;		// указатель на начало стека
 DynProduct *Run;        // текущий указатель стека архива 
 int np;
@@ -24,13 +24,13 @@ char Sr[80]="";
 	ReadFileOut(&np,&Beg);//создается архивный дек
 	//ввод кода удаляемого изделия
 	printf("\nУкажите код удаляемого компонента : ");
-	scanf_s("%s", Num, 5);
- 	//Num=(int)ceil(GetNumber(0,999999,1,0,6,0));
+ 	Row=(int)ceil(GetNumber(0,np,1,0,6,0));
 	Cond=0;
-	strcpy(NumPr, Num);
+	counter = 1;
+	RowPr = Row;
 	
 	//поиск введенного кода в деке
-	if ( Num == Beg->Inf.Num)
+	if (Row == 1)
 	{//удаляется крайний левый компонент 
 		Cond=1;
 		Del=Beg; Beg=Beg->Next;
@@ -39,9 +39,9 @@ char Sr[80]="";
   	else
 	{  	//поиск введенного кода в средине cтека
 		//просмотр с левой стороны
-		Run=Beg->Next;
+		Run=Beg;
 		while ( Run->Next != NULL ) 
-		{	if ( Num == Run->Next->Inf.Num )
+		{	if ( Row == counter+1 )
 				{	//в стеке найден компонент с заданным кодом
 					Cond=1;
 					Del=Run->Next;
@@ -50,8 +50,9 @@ char Sr[80]="";
 					free(Del); //освобождение памяти
 					break;
 				}
-				Run=Run->Next;
-			}
+			Run=Run->Next;
+			counter++;
+		}
 	}
   if( Cond == 1 ) //компонент найден и удален
   {  
@@ -64,7 +65,7 @@ char Sr[80]="";
 	{
 		DisposeProduct(Beg);
 		Beg=NULL;
-		printf("\nВ архиве нет компонента с кодом %6s",NumPr);
+		printf("\nВ архиве нет компонента с кодом %d",RowPr);
 	}
 	wait_press_key("\nДля продолжения нажмите любую клавишу\n");
 	return 0;

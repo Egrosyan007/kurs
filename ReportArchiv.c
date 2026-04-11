@@ -1,16 +1,17 @@
 ////#include "desunit.h"
 ////#include "baseunit.h"
+#include <string.h>
 // Обработка архива изделий и формирование отчетов
 //-----------------------------------------WorkUpArchive()
 void WorkUpArchive()
 {           
-unsigned char Shop;              //номер цеха
+char* endptr = 0;
+char Yes[15] = "Да";
+char Day[3], Month[3], Year[5];
+FillString(Yes,11,1);
 int k=-1,m,np;
-int Kod;												 //код изделия
-double	PlanSt1,PlanSt2,PlanGod, //суммарные плановые показатели
-				FactSt1,FactSt2,FactGod, //суммарные фактические показатели
-		    ProcSt1,ProcSt2,ProcGod, //процент выполнения плана
-				BufSt;                   //буферная переменная
+int *plist;
+
 char St[80];
 DynProduct *Beg;				  // указатель на начало стека
 DynProduct *Run;          // текущий указатель стека архива 
@@ -20,106 +21,64 @@ DynProduct *Run;          // текущий указатель стека архива
       return;
 	}
   ReadFileOut(&np,&Beg);//формирование архивного дека
-  printf("\nУкажите номер цеха  ");//ввод номера цеха
-  Shop=(unsigned char)ceil(GetNumber(1,99,1,0,2,0));
-
-	//ПЕЧАТЬ СВЕДЕНИй О ВЫПОЛНЕНИИ ПЛАНА ПО ЦЕХУ
-	PlanSt1=0; PlanSt2=0;
-  FactSt1=0; FactSt2=0;
+	//ПЕЧАТЬ СВЕДЕНИй О ЮНОШАХ ПРИЗЫВАЕМЫХ НА СЛУЖБУ
+  m = 1;
   k=0; Run=Beg;
+  plist = (int *)malloc(sizeof(int)*np);
   while (Run!=NULL) 
   {	//поиск сведений по заданному цеху
-    if (Shop==Run->Inf.NumberShop)
-		{	//Подсчет плановых и фактических показателей по цеху
-      k++;
-      BufSt=Run->Inf.Plan[0]*Run->Inf.Price;
-      PlanSt1+=BufSt;
-      BufSt=Run->Inf.Plan[1]*Run->Inf.Price;
-      PlanSt2+=BufSt;
-      BufSt=Run->Inf.Fact[0]*Run->Inf.Price;
-      FactSt1+=BufSt;
-      BufSt=Run->Inf.Fact[1]*Run->Inf.Price;
-      FactSt2+=BufSt;
-			}
+    if (strcmp(Yes,Run->Inf.IsApproved) == 0)
+		{ strncpy(Day, Run->Inf.Date, 2);
+      strncpy(Month, Run->Inf.Date+3, 2);
+      strncpy(Year, Run->Inf.Date+6, 4);
+
+      if (strtol(Year, &endptr, 10) < 2008)
+        {plist[k] = m; k++;}
+      else if (strtol(Year, &endptr, 10) == 2008)
+        if (strtol(Month, &endptr, 10) < 8)
+          {plist[k] = m; k++;}
+        else if (strtol(Month, &endptr, 10) == 8)
+          if (strtol(Day, &endptr, 10) < 2)
+            {plist[k] = m; k++;}
+		}
+    m++;
     Run=Run->Next;
 	}
   if (k==0)
-    printf("В архиве нет сведений о цехе %d",Shop);
+    printf("В архиве нет юнош, подлежащих призыву на военную службу");
+
   else
 	{
-    PlanGod=PlanSt1+PlanSt2;//показатели за год
-    FactGod=FactSt1+FactSt2;
-    ProcSt1=100*FactSt1/PlanSt1;//процент выполнения плана
-    ProcSt2=100*FactSt2/PlanSt2;
-    ProcGod=100*FactGod/PlanGod;
-		//печать заголовка таблицы
-		sprintf(St,"             СВЕДЕНИЯ О ВЫПОЛНЕНИИ ПЛАНА ПО ЦЕХУ %2d",
-											Shop);
-    WritelnString(St);
+      //ПЕЧАТЬ СВЕДЕНИЙ ПО ВЫПОЛНЕНИЮ ПЛАНА ПО ИЗДЕЛИЯМ
+      //печать заголовка таблицы
+      WritelnString(
+"\n            СПИСОК ЮНОШ ПОДЛЕЖАЩИХ ПРИЗЫВУ НА ВОЕННУЮ СЛУЖБУ");
     WritelnString(
-" ---------------------------------------------------------------- ");
-    WritelnString(
-"|                    |         Полугодие           |     За      |");
-    WritelnString(
-"|                    |-----------------------------|     год     |");
-    WritelnString(
-"|                    |       1      |      2       |             |");
-    WritelnString(
-" ---------------------------------------------------------------- ");
-		//Печать строк таблицы
-		sprintf(St,
-			"| План выпуска       |  %10.2f  |  %10.2f  |  %10.2f |",
-			PlanSt1,PlanSt2,PlanGod);
-    WritelnString(St);
-		sprintf(St,
-			"| Фактический выпуск |  %10.2f  |  %10.2f  |  %10.2f |",
-			FactSt1,FactSt2,FactGod);
-    WritelnString(St);
-		sprintf(St,
-			"| Процент выполнения |  %10.2f  |  %10.2f  |  %10.2f |",
-			ProcSt1,ProcSt2,ProcGod);
-    WritelnString(St);
-    WritelnString(
-" ---------------------------------------------------------------- ");
-	}
-	wait_press_key("\nДля продолжения нажмите любую клавишу\n");
-
-	//ПЕЧАТЬ СВЕДЕНИЙ ПО НЕВЫПОЛНЕНИЮ ПЛАНА ПО ИЗДЕЛИЯМ
-	//печать заголовка таблицы
-	WritelnString(
-"\n СПИСОК ИЗДЕЛИЙ, ПО КОТОРЫМ НЕ ВЫПОЛНЕН ГОДОВОЙ ПЛАН ПРОИЗВОДСТВА");
-  WritelnString(
-" --------------------------------------------------------------- ");
-  WritelnString(
-"|N п/п|   Код    |       Наименование изделия        |Выполнение|");
-  WritelnString(
-"|     | изделия  |                                   | плана, % |");
-  WritelnString(
-" --------------------------------------------------------------- ");
-
-	m=0;k=-2;
-  Run=Beg;
-  while ( Run != NULL)	//цикл просмотра дека
-	{	//расчет выполнения плана по изделию 
-	  ProcGod=100*(Run->Inf.Fact[0]+Run->Inf.Fact[1])/
-                (Run->Inf.Plan[0]+Run->Inf.Plan[1]);
-		if (ProcGod<100) //план не выполнен
-		{	//расчет показателей и печать строки
-			m++;	//для колонки номер по порядку
-			Kod=Run->Inf.Kod;
-			k=SearchKodif(Kod,nk);//поиск кода изделия в кодификаторе
-
-			sprintf(St,"|  %2d |  %6d  | %s|%8.2f  |",m,Kod,
-				(k>-1) ? Kodifs[k].Name : "                                  ",
-					ProcGod);
-			//печать сформированной строки
-			WritelnString(St);
-		}
-   Run=Run->Next;
+" _________________________________________________________________________ ");
+      WritelnString(
+"|  N |      ФИО      | Дата рождения | Номер дела |         Адрес         |");
+      WritelnString(
+"|-------------------------------------------------------------------------|");
+      m=1; k = 0;
+      Run=Beg;
+      while ( Run != NULL)	//цикл просмотра дека
+      {	//расчет выполнения плана по изделию
+        if (m == plist[k]) {
+          sprintf(St,"| %2d  %15s %15s %s        %s|",
+                  m, Run->Inf.Names, Run->Inf.Date, Run->Inf.Num, Run->Inf.Street);
+          //печать сформированной строки
+          WritelnString(St);
+          k++;
+        }
+        Run=Run->Next;
+        m++;
+      }
+      
 	}
   WritelnString(
-" ---------------- ");
+" ------------------------------------------------------------------------- ");
 //" --------------------------------------------------------------- ");
+  free(plist);
 	DisposeProduct(Beg);//удаление дека
 	printf("\nОбработка архива закончена");
 

@@ -1,5 +1,5 @@
 //Сортировка архива
-////#include "desunit.h"
+#include "desunit.h"
 ////#include "baseunit.h"
 //---------------------------------------------SortArchive()
 //Сортировка архива по возрастанию кода изделия. Просмотр дека 
@@ -18,15 +18,14 @@ DynProduct *Beg;		// указатель на начало стека
 		 return 1;
 	}
 	ReadFileOut(&np,&Beg);	//Формирование архивного дека
-	//Сортировка дека по возрастанию "школьным" методом
+	//Сортировка дека по алфавиту "Пузырьком"
 
 	for ( Runi=Beg; Runi!=NULL; Runi=Runi->Next )
-		for ( Runj=Beg; Runj!=NULL; Runj=Runj->Next )
-			if ( Runi->Inf.Kod < Runj->Inf.Kod )
-			{
-        Product=Runi->Inf; 
+		for ( Runj=Runi->Next; Runj!=NULL; Runj=Runj->Next )
+			if ( Runi->Inf.Num[0] > Runj->Inf.Num[0] )
+			{	Product=Runi->Inf; 
 				Runi->Inf=Runj->Inf;
-        Runj->Inf=Product;
+       			Runj->Inf=Product;
 			}
 
 	WriteFileOut(Beg);	//запись дека в архивный файл

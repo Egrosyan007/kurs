@@ -10,7 +10,8 @@ ProductType Product;
 DynProduct *Run;			// текущий указатель дека архива 
 DynProduct *Beg;		// указатель на начало стека
 unsigned char Cond;		// флаг 1-код найден в деке
-int Sr, np;
+int np;
+char Sr[20];
 	if (SignArchive==0)	//архив не создан
 	{
 		 printf("\nАрхив не создан. Режим отменяется.\n");
@@ -28,15 +29,16 @@ int Sr, np;
 	if ( ReadFileOut(&np,&Beg) == 1) //дек не создан 
 			{ fclose(fAddTxt); return 1; }
 	do
-	{ //Создание структуры изделия из строки файла 
+	{ //Создание структуры из строки файла 
 		if (ReadProduct(fAddTxt, &Product)==0)
 		{	
-			Sr=Product.Kod;	  //код добавляемого изделия
+			strcpy(Sr, Product.Num);
+			//Sr=Product.Num;	  //код добавляемого изделия
 			Run=Beg;           //начало просмотра слева
 			Cond=0;	          //флаг - код не найден
       while (Run!=NULL) //поиск кода изделия в деке
 			{
-				if (Run->Inf.Kod==Sr) 
+				if (Run->Inf.Num==Sr) 
 					{ Cond=1; break; }	//код изделия в деке найден
         Run=Run->Next;
 			}
@@ -51,7 +53,7 @@ int Sr, np;
 				Run = NULL;
 			}
       else  // (Cond == 1)
-        printf("\nВ архиве уже есть изделие с кодом %6d",Sr);
+        printf("\nВ архиве уже есть изделие с кодом %6s", Sr);
 		}
 	}
 	while ( ! feof(fAddTxt) );

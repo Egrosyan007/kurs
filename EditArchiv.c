@@ -9,8 +9,9 @@ void MakeComponent(ProductType *Product);
 // Просмотр дека слева направо
 // Возвращает 1, если архив не создан, 0 - создан
 int ChangeArchive()
-{            
-int Kod,Kod1,np;
+{           
+int Row, RowPr, counter; 
+int np;
 unsigned char Cond=0;
 ProductType Product;
 DynProduct *Beg;		// указатель на начало стека
@@ -25,29 +26,30 @@ DynProduct *Run;        // текущий указатель стека архива
 	ReadFileOut(&np,&Beg);
 	//ввод кода изменяемого компонента
   printf("\nУкажите код изделия изменяемого компонента :");
-	Kod=(int)ceil(GetNumber(0,999999,1,0,6,0));
-  Kod1=Kod; printf("Kod = %6d",Kod1);
-	Run=Beg; Cond=0;
+	Row=(int)ceil(GetNumber(1,np,1,0,6,0));
+  RowPr=Row; printf("Строка = %2d",RowPr);
+	Run=Beg; Cond=0; counter = 1;
   while (Run!=NULL) //цикл поиска введенного кода в деке
   {
-		if (Kod==Run->Inf.Kod)
+		if (Row==counter)
 		{	//компонент найден
 			Cond=1;
 			//считывание текущих значений 
 			Product=Run->Inf;
-			printf("\n          Укажите следующие реквизиты :\n");
-			printf("   ед.измерения  цена  план-1  план-2  факт-1  факт-2\n");
+			printf("\n     Укажите следующие реквизиты :\n");
+			printf("         Номер дела   Годность к службе\n");
 			MakeComponent(&Product);	//ввод изменений в полях
 			Run->Inf=Product;			//запись измененной структуры в стек
 			WriteFileOut(Beg);			//запись стека в архивный файл
 			Beg=NULL;
-			printf("Изменение компонента в архиве закончено\n");
+			printf("\nИзменение компонента в архиве закончено\n");
 			break;
-		} 
+		}
+		counter++;
 		Run=Run->Next;
 	}
-  if (! Cond )	//компонент не найден
-    printf("\nВ архиве нет компонента с кодом %d\n",Kod1);
+	if (! Cond )	//компонент не найден
+    printf("\nВ архиве нет компонента с кодом %d\n",RowPr);
 	wait_press_key("\nДля продолжения нажмите любую клавишу\n");
 	return 0;
 }	//-----СhangeArchive() 
@@ -68,9 +70,8 @@ void MakeComponent(ProductType *Product)
 	char Seps[]=" \t\n";
 
 	//печать на экран текущих значений
-	printf("Тек.зн. %5s  %6.2f  %6.0f  %6.0f  %6.0f  %6.0f\n",
-					Product->Dimens,Product->Price,Product->Plan[0],
-					Product->Plan[1],Product->Fact[0],Product->Fact[1]);
+	printf("Тек. зн. %s        %s\nНов. зн. ",
+		 	Product->Num, Product->IsApproved);
 	rewind(stdin);	//очистка буфера клавиатуры
 	/*
 		//очистка буфера клавиатуры(если fflush(stdin) не работает)
@@ -83,13 +84,9 @@ void MakeComponent(ProductType *Product)
 		k++;
 		switch ( k )
 		{
-		 case 1:strcpy(Product->Dimens,token);
-								FillString(Product->Dimens,5,1);			break;
-		 case 2:sscanf_s(token,"%lf",&Product->Price);		break;
-		 case 3:sscanf_s(token,"%lf",&Product->Plan[0]);	break;
-		 case 4:sscanf_s(token,"%lf",&Product->Plan[1]);	break;
-		 case 5:sscanf_s(token,"%lf",&Product->Fact[0]);	break;
-		 case 6:sscanf_s(token,"%lf",&Product->Fact[1]);	break;
+				case 1:strcpy(Product->Num,token); //FillString(Product->Num,13,1);
+				break;
+				case 2:strcpy(Product->IsApproved,token); FillString(Product->IsApproved,11,1);break;
 		}
 		token=strtok(NULL,Seps);	//Выделение очередного слова
 	}
